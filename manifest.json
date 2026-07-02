@@ -1,0 +1,18 @@
+{
+  "name": "PitchByPitch Tracker",
+  "short_name": "PitchByPitch",
+  "description": "Offline-first pitch-by-pitch tracker for baseball and softball games.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0c0f12",
+  "theme_color": "#10b981",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>PitchByPitch Tracker</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/png" href="icon.png">
+  <!-- Outfit Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Meta for PWA -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#10b981">
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- Header with Live Scoreboard & Game Info -->
+    <header class="app-header">
+      <div class="header-logo">
+        <span class="accent-dot"></span> PitchByPitch
+      </div>
+      <div id="live-scoreboard" class="live-scoreboard hidden">
+        <div class="scoreboard-teams">
+          <div class="team-row">
+            <span class="team-color-indicator away"></span>
+            <span id="score-away-name" class="team-name">AWY</span>
+            <span id="score-away-runs" class="team-score">0</span>
+          </div>
+          <div class="team-row">
+            <span class="team-color-indicator home"></span>
+            <span id="score-home-name" class="team-name">HOM</span>
+            <span id="score-home-runs" class="team-score">0</span>
+          </div>
+        </div>
+        
+        <div class="scoreboard-stats">
+          <div class="inning-display">
+            <span id="inning-arrow" class="arrow-up"></span>
+            <span id="inning-number">1st</span>
+          </div>
+          <div class="outs-display">
+            <span class="stat-label">OUTS</span>
+            <div class="outs-dots">
+              <span id="out-dot-1" class="dot"></span>
+              <span id="out-dot-2" class="dot"></span>
+            </div>
+          </div>
+          <div class="count-display">
+            <span id="balls-count">0</span>-<span id="strikes-count">0</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Tab Navigation -->
+      <nav class="tab-navigation">
+        <button class="nav-btn active" data-tab="tab-game">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/></svg>
+          <span>Game</span>
+        </button>
+        <button class="nav-btn" data-tab="tab-teams">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+          <span>Rosters</span>
+        </button>
+        <button class="nav-btn" data-tab="tab-history">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+          <span>History</span>
+        </button>
+      </nav>
+    </header>
+
+    <main class="app-body">
+      
+      <!-- TAB 1: ACTIVE GAME TRACKER -->
+      <section id="tab-game" class="tab-panel active">
+        <!-- Setup Game Form (Shown if no active game) -->
+        <div id="game-setup-container" class="card setup-card">
+          <h2>Start New Game</h2>
+          <div class="form-group">
+            <label for="setup-away-team">Away Team</label>
+            <select id="setup-away-team" class="form-control"></select>
+          </div>
+          <div class="form-group">
+            <label for="setup-home-team">Home Team</label>
+            <select id="setup-home-team" class="form-control"></select>
+          </div>
+          <div class="form-group">
+            <label for="setup-innings">Standard Innings</label>
+            <input type="number" id="setup-innings" class="form-control" value="7" min="1" max="9">
+          </div>
+          <button id="btn-start-game" class="btn btn-primary btn-block">Play Ball</button>
+        </div>
+
+        <!-- Active Game Layout (Hidden by default) -->
+        <div id="active-game-container" class="game-layout hidden">
+          
+          <!-- Pitch Logging & Mini Diamond Grid -->
+          <div class="game-dashboard">
+            <!-- Left Panel: Current Pitcher/Batter Status & Logs -->
+            <div class="status-panel card">
+              <div class="status-block">
+                <div class="status-header">At Bat</div>
+                <div id="current-batter-info" class="player-highlight">
+                  <span class="number">#99</span> <span class="name">No Batter</span>
+                  <span class="stats-mini">AVG .000 (0-0)</span>
+                </div>
+              </div>
+              <div class="status-block">
+                <div class="status-header">Pitching</div>
+                <div id="current-pitcher-info" class="player-highlight">
+                  <span class="number">#34</span> <span class="name">No Pitcher</span>
+                  <span class="stats-mini">P: 0 (S: 0 B: 0)</span>
+                </div>
+              </div>
+              
+              <div class="pitch-buttons-grid">
+                <button class="btn btn-ball" data-pitch="Ball">Ball</button>
+                <button class="btn btn-strike" data-pitch="Strike">Strike</button>
+                <button class="btn btn-foul" data-pitch="Foul">Foul</button>
+                <button class="btn btn-hit" data-pitch="Hit">In Play (Hit)</button>
+                <button class="btn btn-out" data-pitch="Out">In Play (Out)</button>
+              </div>
+              
+              <div class="game-actions-row">
+                <button id="btn-undo-pitch" class="btn btn-secondary">
+                  <svg class="icon-small" viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg>
+                  Undo Pitch
+                </button>
+                <button id="btn-end-game" class="btn btn-danger">End Game</button>
+              </div>
+            </div>
+
+            <!-- Right Panel: Visual Base Diamond Map -->
+            <div class="diamond-panel card">
+              <div class="baseball-field">
+                <div class="diamond-lines"></div>
+                <!-- Bases -->
+                <div id="field-base-2" class="base second">
+                  <div class="base-marker"></div>
+                  <div class="runner-name-tag hidden">Runner</div>
+                </div>
+                <div id="field-base-3" class="base third">
+                  <div class="base-marker"></div>
+                  <div class="runner-name-tag hidden">Runner</div>
+                </div>
+                <div id="field-base-1" class="base first">
+                  <div class="base-marker"></div>
+                  <div class="runner-name-tag hidden">Runner</div>
+                </div>
+                <div id="field-base-home" class="base home-plate">
+                  <div class="base-marker-home"></div>
+                </div>
+              </div>
+              
+              <div class="lineup-indicators">
+                <div class="lineup-indicator-col">
+                  <span class="label">ON DECK:</span>
+                  <span id="player-on-deck" class="val">--</span>
+                </div>
+                <div class="lineup-indicator-col">
+                  <span class="label">IN THE HOLE:</span>
+                  <span id="player-in-the-hole" class="val">--</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Panel: Play By Play Log & Stats summary -->
+          <div class="log-panel card">
+            <div class="panel-tabs">
+              <button class="panel-tab-btn active" data-log-tab="tab-pbp">Play-By-Play</button>
+              <button class="panel-tab-btn" data-log-tab="tab-mini-box">Box Score</button>
+            </div>
+            
+            <div id="tab-pbp" class="panel-tab-content active">
+              <div id="play-by-play-log" class="pbp-log-container">
+                <div class="log-empty">No plays logged yet. Start pitching!</div>
+              </div>
+            </div>
+            
+            <div id="tab-mini-box" class="panel-tab-content">
+              <div class="boxscore-mini-wrapper">
+                <table id="linescore-table" class="linescore-table">
+                  <thead>
+                    <tr id="linescore-header">
+                      <th>Team</th>
+                      <th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th>
+                      <th>R</th><th>H</th><th>E</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr id="linescore-away">
+                      <td class="team-col">Away</td>
+                      <td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td>
+                      <td class="runs-col">0</td><td>0</td><td>0</td>
+                    </tr>
+                    <tr id="linescore-home">
+                      <td class="team-col">Home</td>
+                      <td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td>
+                      <td class="runs-col">0</td><td>0</td><td>0</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+      </section>
+
+      <!-- TAB 2: TEAMS & ROSTERS -->
+      <section id="tab-teams" class="tab-panel">
+        <div class="roster-grid">
+          <!-- Team Manager -->
+          <div class="card roster-left-panel">
+            <h2>Teams</h2>
+            <div class="team-creation-row">
+              <input type="text" id="new-team-name" class="form-control" placeholder="New Team Name">
+              <button id="btn-create-team" class="btn btn-primary">Add Team</button>
+            </div>
+            
+            <div id="teams-list" class="teams-list-group">
+              <!-- Dynamically populated teams -->
+            </div>
+            
+            <div class="card-action-box margin-top-lg">
+              <h3>Database Tools</h3>
+              <div class="db-actions-grid">
+                <button id="btn-export-db" class="btn btn-secondary btn-sm">Export Data (JSON)</button>
+                <label for="import-db-file" class="btn btn-secondary btn-sm file-label">Import Data (JSON)</label>
+                <input type="file" id="import-db-file" accept=".json" class="hidden-file-input">
+              </div>
+            </div>
+          </div>
+
+          <!-- Roster Manager -->
+          <div class="card roster-right-panel">
+            <div class="roster-panel-header">
+              <h2 id="roster-team-title">Select a Team</h2>
+              <button id="btn-delete-team" class="btn btn-danger btn-sm hidden">Delete Team</button>
+            </div>
+            
+            <div id="roster-editor-container" class="hidden">
+              <!-- Add Player -->
+              <div class="add-player-row">
+                <input type="text" id="new-player-name" class="form-control" placeholder="Player Name">
+                <input type="number" id="new-player-number" class="form-control" placeholder="#" min="0" max="99">
+                <button id="btn-add-player" class="btn btn-primary">Add</button>
+              </div>
+
+              <!-- Roster Players Table -->
+              <div class="table-wrapper">
+                <table class="roster-table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Name</th>
+                      <th>Lineup Position</th>
+                      <th>Defense Position</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="roster-players-list">
+                    <!-- Loaded dynamically -->
+                  </tbody>
+                </table>
+              </div>
+              
+              <div class="roster-instructions">
+                <p class="ponytail-note"><strong>Lineup Position:</strong> Enter 1 to 9+ (e.g., 10, 11) to specify batting order. Leave blank if not in batting lineup.</p>
+                <p class="ponytail-note"><strong>Defense Position:</strong> Set 1 to 9 (1: P, 2: C, 3: 1B, 4: 2B, 5: 3B, 6: SS, 7: LF, 8: CF, 9: RF). Non-defenders leave blank.</p>
+              </div>
+            </div>
+            <div id="roster-select-prompt" class="roster-prompt-placeholder">
+              Please choose a team from the list on the left to edit its roster and set lineups.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: GAME HISTORY & STATS -->
+      <section id="tab-history" class="tab-panel">
+        <div class="history-grid">
+          <!-- Game List -->
+          <div class="card history-left-panel">
+            <h2>Game Log</h2>
+            <div id="game-history-list" class="game-history-group">
+              <!-- Filled dynamically -->
+            </div>
+          </div>
+
+          <!-- Game Detail Viewer / Stats Tables -->
+          <div class="card history-right-panel">
+            <h2 id="history-detail-title">Select a Game</h2>
+            <div id="game-detail-placeholder" class="roster-prompt-placeholder">
+              Choose a completed game from the list on the left to see stats and the complete play log.
+            </div>
+            
+            <div id="game-detail-container" class="hidden">
+              <div class="history-detail-header-actions">
+                <button id="btn-delete-game" class="btn btn-danger btn-sm">Delete Game File</button>
+              </div>
+              <div class="game-details-box-score">
+                <div class="linescore-display-box card">
+                  <table id="detail-linescore" class="linescore-table">
+                    <!-- Populated dynamically -->
+                  </table>
+                </div>
+              </div>
+              
+              <div class="detail-tabs">
+                <button class="detail-tab-btn active" data-detail-tab="detail-batting">Batting</button>
+                <button class="detail-tab-btn" data-detail-tab="detail-pitching">Pitching</button>
+                <button class="detail-tab-btn" data-detail-tab="detail-fielding">Fielding</button>
+                <button class="detail-tab-btn" data-detail-tab="detail-pbp">Play Log</button>
+              </div>
+
+              <!-- Batting Stats View -->
+              <div id="detail-batting" class="detail-tab-content active">
+                <h3>Batting Statistics</h3>
+                <div class="table-wrapper">
+                  <table class="stats-table" id="table-detail-batting">
+                    <thead>
+                      <tr>
+                        <th>Player</th>
+                        <th>Team</th>
+                        <th>AB</th><th>R</th><th>H</th><th>RBI</th><th>BB</th><th>SO</th><th>AVG</th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Pitching Stats View -->
+              <div id="detail-pitching" class="detail-tab-content">
+                <h3>Pitching Statistics</h3>
+                <div class="table-wrapper">
+                  <table class="stats-table" id="table-detail-pitching">
+                    <thead>
+                      <tr>
+                        <th>Player</th>
+                        <th>Team</th>
+                        <th>IP</th><th>H</th><th>R</th><th>BB</th><th>SO</th><th>P</th><th>S/B</th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Fielding Stats View -->
+              <div id="detail-fielding" class="detail-tab-content">
+                <h3>Fielding Statistics</h3>
+                <div class="table-wrapper">
+                  <table class="stats-table" id="table-detail-fielding">
+                    <thead>
+                      <tr>
+                        <th>Player</th>
+                        <th>Team</th>
+                        <th>PO</th><th>A</th><th>E</th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Game Play Log View -->
+              <div id="detail-pbp" class="detail-tab-content">
+                <h3>Play-by-Play Scroll</h3>
+                <div id="detail-pbp-list" class="detail-pbp-list-container"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- SEQUENTIAL RUNNER ADJUSTMENT MODAL OVERLAY -->
+    <div id="runner-modal" class="modal-overlay hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div>
+            <h2 id="runner-modal-title">Pitch Result: Hit</h2>
+            <p class="modal-subtitle">Specify ending bases for batter and runners.</p>
+          </div>
+        </div>
+        
+        <div class="modal-body">
+          <div class="runner-adjustment-layout">
+            <!-- Left Side: Interactive Diamond -->
+            <div class="interactive-diamond-box">
+              <div class="interactive-field">
+                <div class="field-diamond-line"></div>
+                
+                <!-- Base Nodes on the adjustment diamond -->
+                <div class="adj-base second-base" data-base="2">
+                  <span class="base-num">2</span>
+                </div>
+                <div class="adj-base third-base" data-base="3">
+                  <span class="base-num">3</span>
+                </div>
+                <div class="adj-base first-base" data-base="1">
+                  <span class="base-num">1</span>
+                </div>
+                <div class="adj-base home-base" data-base="4">
+                  <span class="base-num">H</span>
+                </div>
+                
+                <!-- Center Pitcher Area for Out Destination -->
+                <div class="adj-out-zone" data-base="0">
+                  <span class="out-zone-label">OUT</span>
+                </div>
+              </div>
+              <p class="diamond-instructions">Click a runner on the right, then click a base (1, 2, 3, H) or "OUT" to move them.</p>
+            </div>
+            
+            <!-- Right Side: Active Runners List -->
+            <div class="runners-selector-panel">
+              <h3>Active Runners</h3>
+              <div id="modal-runners-list" class="modal-runners-list">
+                <!-- Dynamically filled with runners and batter -->
+              </div>
+              
+              <!-- Fielding Assist Details (Appears when someone goes OUT or reaches on ERROR) -->
+              <div id="fielding-details-container" class="fielding-details-card card hidden">
+                <h3>Fielding Stats Credit</h3>
+                <div class="form-group-row">
+                  <label>Putout by:</label>
+                  <select id="fielding-putout" class="form-control-sm">
+                    <option value="">-- None --</option>
+                    <option value="1">1: P (Pitcher)</option>
+                    <option value="2">2: C (Catcher)</option>
+                    <option value="3">3: 1B (First Base)</option>
+                    <option value="4">4: 2B (Second Base)</option>
+                    <option value="5">5: 3B (Third Base)</option>
+                    <option value="6">6: SS (Shortstop)</option>
+                    <option value="7">7: LF (Left Field)</option>
+                    <option value="8">8: CF (Center Field)</option>
+                    <option value="9">9: RF (Right Field)</option>
+                  </select>
+                </div>
+                
+                <div class="form-group-row">
+                  <label>Assist by:</label>
+                  <select id="fielding-assist" class="form-control-sm">
+                    <option value="">-- None --</option>
+                    <option value="1">1: P</option>
+                    <option value="2">2: C</option>
+                    <option value="3">3: 1B</option>
+                    <option value="4">4: 2B</option>
+                    <option value="5">5: 3B</option>
+                    <option value="6">6: SS</option>
+                    <option value="7">7: LF</option>
+                    <option value="8">8: CF</option>
+                    <option value="9">9: RF</option>
+                  </select>
+                </div>
+
+                <div class="form-group-row">
+                  <label>Error by:</label>
+                  <select id="fielding-error" class="form-control-sm">
+                    <option value="">-- None --</option>
+                    <option value="1">1: P</option>
+                    <option value="2">2: C</option>
+                    <option value="3">3: 1B</option>
+                    <option value="4">4: 2B</option>
+                    <option value="5">5: 3B</option>
+                    <option value="6">6: SS</option>
+                    <option value="7">7: LF</option>
+                    <option value="8">8: CF</option>
+                    <option value="9">9: RF</option>
+                  </select>
+                </div>
+                
+                <div class="form-group-row">
+                  <label>Batter RBI Credit:</label>
+                  <input type="number" id="batter-rbi" class="form-control-sm" value="0" min="0" max="4">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="modal-footer">
+          <button id="btn-modal-cancel" class="btn btn-secondary">No Runner Changes</button>
+          <button id="btn-modal-save" class="btn btn-primary">Save & Continue</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  
+  <script src="app.js"></script>
+</body>
+</html>
