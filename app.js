@@ -805,6 +805,7 @@ function openRunnerAdjustmentModal(result) {
   prepopulateDestinations(result, runners);
 
   modalState.runners = runners;
+  resolveForcedAdvances();
   modalState.selectedRunnerIdx = runners.length - 1; // default select the batter
   
   // Render Modal UI
@@ -956,6 +957,24 @@ function highlightInteractiveDiamond() {
   }
 }
 
+function resolveForcedAdvances() {
+  // Sort active runners from back to front by their starting base (Batter: 0, 1st: 1, 2nd: 2, 3rd: 3)
+  const sorted = [...modalState.runners].sort((a, b) => a.fromBase - b.fromBase);
+  
+  // Apply force push cascade from back to front
+  for (let i = 0; i < sorted.length - 1; i++) {
+    const behind = sorted[i];
+    const ahead = sorted[i + 1];
+    
+    // Only cascade force if both players are safe/advancing (toBase > 0)
+    if (behind.toBase > 0 && ahead.toBase > 0) {
+      if (ahead.toBase <= behind.toBase) {
+        ahead.toBase = Math.min(4, behind.toBase + 1);
+      }
+    }
+  }
+}
+
 function assignSelectedRunnerDestination(destBase) {
   const runner = modalState.runners[modalState.selectedRunnerIdx];
   if (!runner) return;
@@ -969,6 +988,7 @@ function assignSelectedRunnerDestination(destBase) {
     
     if (!isEndingPlay) {
       runner.toBase = -1;
+      resolveForcedAdvances();
       renderModalRunnersList();
       highlightInteractiveDiamond();
       return;
@@ -976,6 +996,7 @@ function assignSelectedRunnerDestination(destBase) {
   }
   
   runner.toBase = destBase;
+  resolveForcedAdvances();
   renderModalRunnersList();
   highlightInteractiveDiamond();
 }
