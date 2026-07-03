@@ -806,6 +806,7 @@ function openRunnerAdjustmentModal(result) {
 
   modalState.runners = runners;
   resolveForcedAdvances();
+  updateInteractiveDiamondBases();
   modalState.selectedRunnerIdx = runners.length - 1; // default select the batter
   
   // Render Modal UI
@@ -958,20 +959,51 @@ function highlightInteractiveDiamond() {
 }
 
 function resolveForcedAdvances() {
-  // Sort active runners from back to front by their starting base (Batter: 0, 1st: 1, 2nd: 2, 3rd: 3)
-  const sorted = [...modalState.runners].sort((a, b) => a.fromBase - b.fromBase);
+  // Filter and sort only active runners/batter who are safe/advancing (toBase > 0)
+  const active = modalState.runners
+    .filter(r => r.toBase > 0)
+    .sort((a, b) => a.fromBase - b.fromBase);
   
   // Apply force push cascade from back to front
-  for (let i = 0; i < sorted.length - 1; i++) {
-    const behind = sorted[i];
-    const ahead = sorted[i + 1];
+  for (let i = 0; i < active.length - 1; i++) {
+    const behind = active[i];
+    const ahead = active[i + 1];
     
-    // Only cascade force if both players are safe/advancing (toBase > 0)
-    if (behind.toBase > 0 && ahead.toBase > 0) {
-      if (ahead.toBase <= behind.toBase) {
-        ahead.toBase = Math.min(4, behind.toBase + 1);
-      }
+    if (ahead.toBase <= behind.toBase) {
+      ahead.toBase = Math.min(4, behind.toBase + 1);
     }
+  }
+}
+
+function updateInteractiveDiamondBases() {
+  const defaults = { 1: "1", 2: "2", 3: "3", 4: "H", 0: "OUT" };
+  const occupied = { 1: [], 2: [], 3: [], 4: [], 0: [] };
+  
+  modalState.runners.forEach(r => {
+    if (r.toBase in occupied) {
+      const parts = r.name.split(' ');
+      const initials = parts.length >= 2 ? (parts[0][0] + parts[1][0]).toUpperCase() : r.name.substring(0, 2).toUpperCase();
+      occupied[r.toBase].push(initials);
+    }
+  });
+
+  const updateBaseText = (selector, text) => {
+    const el = document.querySelector(selector);
+    if (el) {
+      el.innerText = text;
+      el.style.fontSize = text.length > 2 ? "0.7rem" : "";
+    }
+  };
+
+  updateBaseText('.first-base .base-num', occupied[1].length > 0 ? occupied[1].join('+') : defaults[1]);
+  updateBaseText('.second-base .base-num', occupied[2].length > 0 ? occupied[2].join('+') : defaults[2]);
+  updateBaseText('.third-base .base-num', occupied[3].length > 0 ? occupied[3].join('+') : defaults[3]);
+  updateBaseText('.home-base .base-num', occupied[4].length > 0 ? occupied[4].join('+') : defaults[4]);
+  
+  const outEl = document.querySelector('.adj-out-zone .out-zone-label');
+  if (outEl) {
+    outEl.innerText = occupied[0].length > 0 ? "OUT: " + occupied[0].join('+') : defaults[0];
+    outEl.style.fontSize = occupied[0].length > 0 ? "0.6rem" : "";
   }
 }
 
@@ -989,6 +1021,7 @@ function assignSelectedRunnerDestination(destBase) {
     if (!isEndingPlay) {
       runner.toBase = -1;
       resolveForcedAdvances();
+      updateInteractiveDiamondBases();
       renderModalRunnersList();
       highlightInteractiveDiamond();
       return;
@@ -997,6 +1030,7 @@ function assignSelectedRunnerDestination(destBase) {
   
   runner.toBase = destBase;
   resolveForcedAdvances();
+  updateInteractiveDiamondBases();
   renderModalRunnersList();
   highlightInteractiveDiamond();
 }
