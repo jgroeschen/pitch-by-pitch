@@ -870,9 +870,9 @@ function prepopulateDestinations(result, runners) {
       else r.toBase = r.fromBase; // Holds
     });
   } else {
-    // Default Ball, Strike, Foul: all hold, batter holds at home (0)
+    // Default Ball, Strike, Foul: all hold, batter remains at home (-1)
     runners.forEach(r => {
-      if (r.fromBase === 0) r.toBase = 0;
+      if (r.fromBase === 0) r.toBase = -1;
       else r.toBase = r.fromBase;
     });
   }
@@ -890,7 +890,10 @@ function renderModalRunnersList() {
     let toStr = "Hold";
     let destClass = "";
     
-    if (r.toBase === 0) {
+    if (r.fromBase === 0 && r.toBase === -1) {
+      toStr = "Still At Bat";
+      destClass = "";
+    } else if (r.toBase === 0) {
       toStr = "OUT";
       destClass = "dest-out";
     } else if (r.toBase === 4) {
@@ -943,7 +946,7 @@ function highlightInteractiveDiamond() {
     targetSelector = '.second-base';
   } else if (dest === 3) {
     targetSelector = '.third-base';
-  } else if (dest === 4) {
+  } else if (dest === 4 || dest === -1) {
     targetSelector = '.home-base';
   }
   
@@ -957,10 +960,22 @@ function assignSelectedRunnerDestination(destBase) {
   const runner = modalState.runners[modalState.selectedRunnerIdx];
   if (!runner) return;
   
-  // Rules check: batter (fromBase 0) cannot "hold" at home plate if pitch result ended plate appearance
-  // but let them place them freely.
-  runner.toBase = destBase;
+  // If batter clicks Home Plate (4) on a non-ending play, keep them at bat (-1)
+  if (runner.fromBase === 0 && destBase === 4) {
+    const g = state.activeGame;
+    const isStrike3 = (modalState.pitchResult === "Strike" && g.strikes === 2);
+    const isBall4 = (modalState.pitchResult === "Ball" && g.balls === 3);
+    const isEndingPlay = (modalState.pitchResult === "Hit" || modalState.pitchResult === "Out" || isStrike3 || isBall4);
+    
+    if (!isEndingPlay) {
+      runner.toBase = -1;
+      renderModalRunnersList();
+      highlightInteractiveDiamond();
+      return;
+    }
+  }
   
+  runner.toBase = destBase;
   renderModalRunnersList();
   highlightInteractiveDiamond();
 }
