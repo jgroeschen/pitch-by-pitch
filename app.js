@@ -231,6 +231,15 @@ function renderTeamsTab() {
     teamsList.appendChild(item);
   });
   
+  const rosterGrid = document.querySelector('.roster-grid');
+  if (rosterGrid) {
+    if (state.selectedTeamId) {
+      rosterGrid.classList.add('show-detail');
+    } else {
+      rosterGrid.classList.remove('show-detail');
+    }
+  }
+  
   if (state.selectedTeamId) {
     const selected = state.teams.find(t => t.id === state.selectedTeamId);
     if (selected) renderRosterEditor(selected);
@@ -1353,6 +1362,15 @@ function renderHistoryTab() {
     listEl.appendChild(item);
   });
   
+  const historyGrid = document.querySelector('.history-grid');
+  if (historyGrid) {
+    if (state.selectedGameId) {
+      historyGrid.classList.add('show-detail');
+    } else {
+      historyGrid.classList.remove('show-detail');
+    }
+  }
+
   if (state.selectedGameId) {
     const selected = state.games.find(g => g.id === state.selectedGameId);
     if (selected) renderGameDetails(selected);
@@ -1537,6 +1555,11 @@ function initHistoryDetailActions() {
       renderHistoryTab();
     }
   });
+
+  document.getElementById('btn-back-to-games').addEventListener('click', () => {
+    state.selectedGameId = null;
+    renderHistoryTab();
+  });
 }
 
 
@@ -1599,6 +1622,11 @@ function initTeamActions() {
     renderRosterEditor(team);
     renderTeamsTab();
     if (state.activeGame) syncActiveGameRosters();
+  });
+
+  document.getElementById('btn-back-to-teams').addEventListener('click', () => {
+    state.selectedTeamId = null;
+    renderTeamsTab();
   });
 }
 

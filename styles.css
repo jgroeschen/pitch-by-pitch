@@ -1303,43 +1303,197 @@ body {
   display: none !important;
 }
 
+.hidden-desktop {
+  display: none !important;
+}
+
 /* Responsive Rules */
 @media (max-width: 768px) {
+  body {
+    overflow: hidden; /* Prevent rubber-banding of the main viewport on mobile */
+    height: 100dvh;
+  }
+  
+  .app-container {
+    height: 100dvh;
+  }
+
+  .app-body {
+    padding: 8px;
+    padding-bottom: 80px; /* Leave space for fixed bottom navigation bar */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .hidden-desktop {
+    display: inline-flex !important;
+  }
+
   .app-header {
     grid-template-columns: 1fr;
-    justify-items: center;
-    padding-bottom: 8px;
+    padding: 6px 12px;
+    gap: 4px;
   }
   
+  .header-logo {
+    display: none !important; /* Hide branding text to maximize screen space */
+  }
+  
+  .live-scoreboard {
+    margin: 0;
+    max-width: 100%;
+    padding: 4px 10px;
+    gap: 12px;
+  }
+
   .tab-navigation {
+    position: fixed;
+    bottom: 0;
+    left: 0;
     width: 100%;
-    justify-content: space-around;
+    background-color: rgba(13, 17, 23, 0.96);
     border-top: 1px solid var(--card-border);
-    padding-top: 6px;
+    border-bottom: none;
+    padding: 8px 12px;
+    display: flex;
+    justify-content: space-around;
+    z-index: 900;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
   }
   
+  .nav-btn {
+    flex-direction: column;
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    gap: 2px;
+    border-radius: var(--border-radius-sm);
+  }
+
+  .nav-btn .icon {
+    width: 20px;
+    height: 20px;
+  }
+
   .game-dashboard {
     grid-template-columns: 1fr;
+    gap: 8px;
   }
-  
+
+  /* Single Column Layout Toggles for Teams and History */
   .roster-grid, .history-grid {
     grid-template-columns: 1fr;
   }
-  
+
+  .roster-grid.show-detail .roster-left-panel,
+  .history-grid.show-detail .history-left-panel {
+    display: none !important;
+  }
+
+  .roster-grid:not(.show-detail) .roster-right-panel,
+  .history-grid:not(.show-detail) .history-right-panel {
+    display: none !important;
+  }
+
   .roster-left-panel, .history-left-panel {
-    max-height: 250px;
+    max-height: none;
+  }
+
+  /* Visual Field Diamond scaling */
+  .baseball-field {
+    max-width: 200px;
+    height: 200px;
   }
   
+  .diamond-lines {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .base {
+    width: 26px;
+    height: 26px;
+  }
+  
+  .base-marker, .base-marker-home {
+    width: 12px;
+    height: 12px;
+  }
+  
+  .base-marker-home {
+    height: 8px;
+  }
+  
+  .base.first { top: 50%; right: 12%; }
+  .base.second { top: 12%; left: 50%; }
+  .base.third { top: 50%; left: 12%; }
+  .base.home-plate { bottom: 12%; }
+  
+  .first .runner-name-tag { left: 32px; top: 2px; }
+  .second .runner-name-tag { top: -20px; }
+  .third .runner-name-tag { right: 32px; top: 2px; }
+
+  /* Pitch Buttons Grid */
+  .pitch-buttons-grid {
+    margin-top: 10px;
+    gap: 6px;
+  }
+  
+  .pitch-buttons-grid button {
+    padding: 12px 4px;
+    font-size: 0.8rem;
+  }
+
+  .btn-hit {
+    font-size: 0.9rem !important;
+  }
+  
+  /* Sequential Runner modal optimization */
+  .modal-overlay {
+    padding: 8px;
+  }
+  
+  .modal-card {
+    max-height: 98%;
+    border-radius: var(--border-radius-md);
+  }
+  
+  .modal-body {
+    padding: 12px;
+  }
+
   .runner-adjustment-layout {
     grid-template-columns: 1fr;
+    gap: 12px;
   }
   
   .interactive-field {
-    width: 180px;
-    height: 180px;
+    width: 160px;
+    height: 160px;
   }
   
-  .first-base { right: 5px; }
-  .third-base { left: 5px; }
-  .field-diamond-line { width: 90px; height: 90px; }
+  .field-diamond-line {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .adj-base {
+    width: 28px;
+    height: 28px;
+    font-size: 0.75rem;
+  }
+  
+  .first-base { right: 0; }
+  .third-base { left: 0; }
+  .second-base { top: 0; }
+  .home-base { bottom: 0; }
+  
+  .adj-out-zone {
+    width: 44px;
+    height: 44px;
+  }
+
+  .out-zone-label {
+    font-size: 0.65rem;
+  }
 }
