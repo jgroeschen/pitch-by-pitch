@@ -1373,34 +1373,32 @@ function renderHistoryTab() {
   
   if (state.games.length === 0) {
     listEl.innerHTML = '<div style="text-align:center;color:var(--text-secondary);padding:30px;">No completed games recorded.</div>';
-    return;
-  }
-  
-  state.games.forEach(game => {
-    const item = document.createElement('div');
-    item.className = `game-history-item ${state.selectedGameId === game.id ? 'active' : ''}`;
-    
-    const winTeam = game.score.away > game.score.home ? game.awayTeamName : game.homeTeamName;
-    const lossTeam = game.score.away > game.score.home ? game.homeTeamName : game.awayTeamName;
-    const winScore = Math.max(game.score.away, game.score.home);
-    const lossScore = Math.min(game.score.away, game.score.home);
-    
-    item.innerHTML = `
-      <div class="game-date">${game.date}</div>
-      <div class="game-teams">
-        <span>${escapeHtml(game.awayTeamName)} vs ${escapeHtml(game.homeTeamName)}</span>
-      </div>
-      <div class="game-meta-score">${winTeam} def. ${lossTeam} (${winScore}-${lossScore})</div>
-    `;
-    
-    item.addEventListener('click', () => {
-      state.selectedGameId = game.id;
-      renderHistoryTab();
-      renderGameDetails(game);
+  } else {
+    state.games.forEach(game => {
+      const item = document.createElement('div');
+      item.className = `game-history-item ${state.selectedGameId === game.id ? 'active' : ''}`;
+      
+      const winTeam = game.score.away > game.score.home ? game.awayTeamName : game.homeTeamName;
+      const lossTeam = game.score.away > game.score.home ? game.homeTeamName : game.awayTeamName;
+      const winScore = Math.max(game.score.away, game.score.home);
+      const lossScore = Math.min(game.score.away, game.score.home);
+      
+      item.innerHTML = `
+        <div class="game-date">${game.date}</div>
+        <div class="game-teams">
+          <span>${escapeHtml(game.awayTeamName)} vs ${escapeHtml(game.homeTeamName)}</span>
+        </div>
+        <div class="game-meta-score">${winTeam} def. ${lossTeam} (${winScore}-${lossScore})</div>
+      `;
+      
+      item.addEventListener('click', () => {
+        state.selectedGameId = game.id;
+        renderHistoryTab();
+      });
+      
+      listEl.appendChild(item);
     });
-    
-    listEl.appendChild(item);
-  });
+  }
   
   const historyGrid = document.querySelector('.history-grid');
   if (historyGrid) {
@@ -1413,7 +1411,14 @@ function renderHistoryTab() {
 
   if (state.selectedGameId) {
     const selected = state.games.find(g => g.id === state.selectedGameId);
-    if (selected) renderGameDetails(selected);
+    if (selected) {
+      renderGameDetails(selected);
+    } else {
+      state.selectedGameId = null;
+      if (historyGrid) historyGrid.classList.remove('show-detail');
+      document.getElementById('game-detail-placeholder').classList.remove('hidden');
+      document.getElementById('game-detail-container').classList.add('hidden');
+    }
   } else {
     document.getElementById('game-detail-placeholder').classList.remove('hidden');
     document.getElementById('game-detail-container').classList.add('hidden');
