@@ -1327,7 +1327,7 @@ body {
 }
 
 /* Responsive Rules */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   body {
     overflow: hidden; /* Prevent rubber-banding of the main viewport on mobile */
     height: 100dvh;
