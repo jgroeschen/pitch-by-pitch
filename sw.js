@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pitchbypitch-v1.1.4';
+const CACHE_NAME = 'pitchbypitch-v1.1.5';
 const ASSETS = [
   './',
   './index.html',

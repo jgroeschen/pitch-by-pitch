@@ -1750,6 +1750,15 @@ if ('serviceWorker' in navigator) {
       .then(reg => console.log('ServiceWorker registered with scope:', reg.scope))
       .catch(err => console.log('ServiceWorker registration failed:', err));
   });
+
+  // Automatically reload the page when a new service worker version takes control
+  let refreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!refreshing) {
+      refreshing = true;
+      window.location.reload();
+    }
+  });
 }
 
 // App Launch Setup
