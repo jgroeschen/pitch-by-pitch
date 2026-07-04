@@ -77,6 +77,20 @@ body {
   color: var(--text-primary);
 }
 
+.app-version {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  margin-left: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2px 6px;
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--card-border);
+  letter-spacing: normal;
+  display: inline-flex;
+  align-items: center;
+}
+
 .accent-dot {
   width: 8px;
   height: 8px;
@@ -1336,6 +1350,10 @@ body {
   }
   
   .header-logo {
+    justify-content: center;
+  }
+  
+  .header-logo .logo-text {
     display: none !important; /* Hide branding text to maximize screen space */
   }
   
