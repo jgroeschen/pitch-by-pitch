@@ -66,8 +66,8 @@ body {
   -webkit-backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--card-border);
   padding: 10px 16px;
-  display: grid;
-  grid-template-columns: 180px 1fr auto;
+  display: flex;
+  justify-content: space-between;
   align-items: center;
   gap: 16px;
   z-index: 100;
@@ -1349,9 +1349,10 @@ body {
   }
 
   .app-header {
-    grid-template-columns: 1fr;
+    flex-direction: column;
     padding: 6px 12px;
     gap: 4px;
+    align-items: center;
   }
   
   .header-logo {
