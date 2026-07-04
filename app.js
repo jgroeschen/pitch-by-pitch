@@ -353,6 +353,21 @@ function syncActiveGameRosters() {
     g.awayDefense = {};
     awayTeam.players.forEach(p => {
       if (p.position) g.awayDefense[p.position] = p.id;
+      
+      if (!g.playerStats[p.id]) {
+        g.playerStats[p.id] = {
+          name: p.name,
+          number: p.number,
+          teamId: g.settings.awayTeamId,
+          batting: { ab: 0, r: 0, h: 0, rbi: 0, bb: 0, so: 0 },
+          pitching: { pitches: 0, strikes: 0, balls: 0, so: 0, bb: 0, runs: 0, outsRecorded: 0 },
+          fielding: { po: 0, a: 0, e: 0 }
+        };
+      } else {
+        g.playerStats[p.id].name = p.name;
+        g.playerStats[p.id].number = p.number;
+        g.playerStats[p.id].teamId = g.settings.awayTeamId;
+      }
     });
   }
   if (homeTeam) {
@@ -360,6 +375,21 @@ function syncActiveGameRosters() {
     g.homeDefense = {};
     homeTeam.players.forEach(p => {
       if (p.position) g.homeDefense[p.position] = p.id;
+      
+      if (!g.playerStats[p.id]) {
+        g.playerStats[p.id] = {
+          name: p.name,
+          number: p.number,
+          teamId: g.settings.homeTeamId,
+          batting: { ab: 0, r: 0, h: 0, rbi: 0, bb: 0, so: 0 },
+          pitching: { pitches: 0, strikes: 0, balls: 0, so: 0, bb: 0, runs: 0, outsRecorded: 0 },
+          fielding: { po: 0, a: 0, e: 0 }
+        };
+      } else {
+        g.playerStats[p.id].name = p.name;
+        g.playerStats[p.id].number = p.number;
+        g.playerStats[p.id].teamId = g.settings.homeTeamId;
+      }
     });
   }
   dbSaveActiveGame(g);
@@ -435,11 +465,21 @@ async function startNewGame(awayId, homeId, maxInnings) {
 
   // Initialize stats dictionary for all rostered players
   const playerStats = {};
-  [...awayTeam.players, ...homeTeam.players].forEach(p => {
+  awayTeam.players.forEach(p => {
     playerStats[p.id] = {
       name: p.name,
       number: p.number,
-      teamId: p.id < 200 ? awayId : homeId, // ponytail: simple ID routing
+      teamId: awayId,
+      batting: { ab: 0, r: 0, h: 0, rbi: 0, bb: 0, so: 0 },
+      pitching: { pitches: 0, strikes: 0, balls: 0, so: 0, bb: 0, runs: 0, outsRecorded: 0 },
+      fielding: { po: 0, a: 0, e: 0 }
+    };
+  });
+  homeTeam.players.forEach(p => {
+    playerStats[p.id] = {
+      name: p.name,
+      number: p.number,
+      teamId: homeId,
       batting: { ab: 0, r: 0, h: 0, rbi: 0, bb: 0, so: 0 },
       pitching: { pitches: 0, strikes: 0, balls: 0, so: 0, bb: 0, runs: 0, outsRecorded: 0 },
       fielding: { po: 0, a: 0, e: 0 }
