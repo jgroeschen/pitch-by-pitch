@@ -859,6 +859,17 @@ function openRunnerAdjustmentModal(result) {
 
   modalState.runners = runners;
   resolveForcedAdvances();
+
+  // ponytail: Only show modal on empty bases if play is Hit, Out, or third strike
+  const anyoneOnBase = g.bases[1] || g.bases[2] || g.bases[3];
+  const isStrike3 = (result === "Strike" && g.strikes === 2);
+  const showModal = anyoneOnBase || result === "Hit" || result === "Out" || isStrike3;
+
+  if (!showModal) {
+    saveRunnerAdjustment(false);
+    return;
+  }
+
   updateInteractiveDiamondBases();
   modalState.selectedRunnerIdx = runners.length - 1; // default select the batter
   
