@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pitchbypitch-v1.1.0';
+const CACHE_NAME = 'pitchbypitch-v1.1.1';
 const ASSETS = [
   './',
   './index.html',
@@ -32,7 +32,7 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   e.respondWith(
-    caches.match(e.request).then((cachedResponse) => {
+    caches.match(e.request, { ignoreSearch: true }).then((cachedResponse) => {
       if (cachedResponse) {
         // Fetch fresh copy in the background to update the cache (stale-while-revalidate)
         fetch(e.request).then((networkResponse) => {
