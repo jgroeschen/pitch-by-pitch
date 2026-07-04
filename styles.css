@@ -1417,6 +1417,111 @@ body {
     max-height: none;
   }
 
+  /* Add Player Row optimization on mobile */
+  .add-player-row {
+    display: grid;
+    grid-template-columns: 1fr 80px;
+    gap: 8px;
+  }
+  
+  .add-player-row input:nth-child(1) {
+    grid-column: 1 / span 2;
+  }
+  
+  .add-player-row input:nth-child(2) {
+    grid-column: 1;
+  }
+  
+  .add-player-row button {
+    grid-column: 2;
+    height: 100%;
+  }
+
+  /* Roster Table card-style transformation on mobile */
+  .roster-table, .roster-table tbody, .roster-table tr, .roster-table td {
+    display: block;
+  }
+  
+  .roster-table thead {
+    display: none !important;
+  }
+  
+  .roster-table tbody tr {
+    display: grid;
+    grid-template-columns: 50px 1fr auto;
+    gap: 8px 12px;
+    padding: 12px 8px;
+    border-bottom: 1px solid var(--card-border);
+    align-items: center;
+  }
+  
+  .roster-table tbody tr td {
+    padding: 0 !important;
+    border: none !important;
+  }
+  
+  /* Number cell */
+  .roster-table tbody tr td:nth-child(1) {
+    grid-column: 1;
+    grid-row: 1;
+    font-size: 1rem;
+  }
+  
+  /* Name cell */
+  .roster-table tbody tr td:nth-child(2) {
+    grid-column: 2;
+    grid-row: 1;
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  
+  /* Delete button */
+  .roster-table tbody tr td:nth-child(5) {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+    justify-self: end;
+  }
+  
+  /* Lineup and Defense input containers */
+  .roster-table tbody tr td:nth-child(3),
+  .roster-table tbody tr td:nth-child(4) {
+    grid-row: 2;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+  }
+  
+  .roster-table tbody tr td:nth-child(3) {
+    grid-column: 1 / span 2;
+  }
+  
+  .roster-table tbody tr td:nth-child(4) {
+    grid-column: 2;
+    margin-left: auto;
+  }
+  
+  .roster-table tbody tr td:nth-child(3)::before {
+    content: "Lineup:";
+    font-weight: 600;
+  }
+
+  .roster-table tbody tr td:nth-child(4)::before {
+    content: "Def Pos:";
+    font-weight: 600;
+  }
+
+  .roster-table tbody tr td input {
+    width: 44px !important;
+    font-size: 0.75rem;
+    padding: 2px 4px;
+    border: 1px solid var(--card-border);
+    border-radius: var(--border-radius-sm);
+    background: rgba(0,0,0,0.2);
+    text-align: center;
+  }
+
   /* Visual Field Diamond scaling */
   .baseball-field {
     max-width: 200px;
