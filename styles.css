@@ -33,11 +33,16 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 body {
   background-color: var(--bg-color);
   color: var(--text-primary);
   font-family: var(--font-family);
-  overflow-x: hidden;
   height: 100vh;
   display: flex;
   flex-direction: column;

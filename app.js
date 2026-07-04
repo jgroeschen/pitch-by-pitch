@@ -206,6 +206,10 @@ function switchTab(tabId) {
   } else if (tabId === 'tab-game') {
     renderGameTab();
   }
+
+  // Trigger browser layout recalculation and media query evaluation
+  document.body.offsetHeight; // force layout reflow
+  window.dispatchEvent(new Event('resize'));
 }
 
 
